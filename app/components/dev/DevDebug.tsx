@@ -3,6 +3,9 @@
 // Next
 import { Link } from "@/i18n/navigation";
 
+// Next Intl
+import { useLocale } from "next-intl";
+
 // RHF
 import { useFormContext } from "react-hook-form";
 
@@ -10,12 +13,29 @@ import { useFormContext } from "react-hook-form";
 import { BaseButton } from "@/app/components";
 
 // Variables
-import { FORM_FILL_VALUES } from "@/lib/variables";
+import { FORM_FILL_VALUES, LOCALES } from "@/lib/variables";
 
 type DevDebugProps = {};
 
 const DevDebug = ({}: DevDebugProps) => {
     const { reset, formState } = useFormContext();
+    const locale = useLocale();
+
+    const handleFillForm = () => {
+        const currentLocale = LOCALES.find((l) => l.code === locale);
+        const language = currentLocale?.name || "English";
+        const currency = locale === "sr" ? "RSD" : "USD";
+
+        reset({
+            ...FORM_FILL_VALUES,
+            details: {
+                ...FORM_FILL_VALUES.details,
+                language,
+                currency,
+            },
+        });
+    };
+
     return (
         <div className="flex border-2 border-red-500 rounded-md">
             <div className="flex flex-col">
@@ -24,7 +44,7 @@ const DevDebug = ({}: DevDebugProps) => {
                 <BaseButton
                     tooltipLabel="Form Test Fill"
                     variant="outline"
-                    onClick={() => reset(FORM_FILL_VALUES)}
+                    onClick={handleFillForm}
                 >
                     Fill in the form
                 </BaseButton>

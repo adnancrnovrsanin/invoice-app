@@ -11,6 +11,9 @@ import React, {
 
 import { useRouter } from "next/navigation";
 
+// Next Intl
+import { useLocale } from "next-intl";
+
 // RHF
 import { useFormContext } from "react-hook-form";
 
@@ -27,6 +30,7 @@ import {
     SEND_PDF_API,
     SHORT_DATE_OPTIONS,
     LOCAL_STORAGE_INVOICE_DRAFT_KEY,
+    LOCALES,
 } from "@/lib/variables";
 
 // Types
@@ -66,6 +70,7 @@ export const InvoiceContextProvider = ({
     children,
 }: InvoiceContextProviderProps) => {
     const router = useRouter();
+    const locale = useLocale();
 
     // Toasts
     const {
@@ -140,7 +145,19 @@ export const InvoiceContextProvider = ({
      * Generates a new invoice.
      */
     const newInvoice = () => {
-        reset(FORM_DEFAULT_VALUES);
+        // Get language and currency based on current locale
+        const currentLocale = LOCALES.find((l) => l.code === locale);
+        const language = currentLocale?.name || "English";
+        const currency = locale === "sr" ? "RSD" : "USD";
+
+        reset({
+            ...FORM_DEFAULT_VALUES,
+            details: {
+                ...FORM_DEFAULT_VALUES.details,
+                language,
+                currency,
+            },
+        });
         setInvoicePdf(new Blob());
 
         // Clear the draft
